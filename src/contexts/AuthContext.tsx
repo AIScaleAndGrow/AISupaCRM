@@ -8,6 +8,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/config/firebase';
 import { logger } from '@/utils/logger';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -21,16 +22,24 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser(firebaseUser);
+        logger.info('Auth state changed: User logged in', { uid: firebaseUser.uid });
+      } else {
+        setUser(null);
+        logger.info('Auth state changed: User logged out');
+        // Redirect to login when user is logged out
+        navigate('/login', { replace: true });
+      }
       setLoading(false);
-      logger.info('Auth state changed', { user: user?.email });
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const signInWithGoogle = async () => {
     try {
@@ -50,11 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Then sign out from Firebase
       await firebaseSignOut(auth);
-      
-      // Clear user state
-      setUser(null);
-      
-      logger.info('Successfully signed out and cleared all data');
+      logger.info('Successfully signed out');
     } catch (error) {
       logger.error('Error signing out', error);
       throw error;

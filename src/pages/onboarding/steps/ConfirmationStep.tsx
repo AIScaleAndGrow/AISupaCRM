@@ -12,50 +12,73 @@ import {
 } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { StepProps, ConfirmationInputs } from '../types';
+import { StepProps } from '../types';
 import { logger } from '@/utils/logger';
+
+interface ConfirmationInputs {
+  termsAccepted: boolean;
+  marketingConsent: boolean;
+}
 
 const formSchema = z.object({
   termsAccepted: z.boolean().refine((val) => val === true, {
     message: 'You must accept the terms and conditions',
   }),
-  marketingConsent: z.boolean().optional(),
+  marketingConsent: z.boolean(),
 });
 
-export default function ConfirmationStep({
-  data,
+const ConfirmationStep: React.FC<StepProps<ConfirmationInputs>> = ({
   onComplete,
   onBack,
-}: StepProps<ConfirmationInputs>) {
+  savedData,
+}) => {
   const navigate = useNavigate();
-  
+
   const form = useForm<ConfirmationInputs>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      termsAccepted: data?.termsAccepted || false,
-      marketingConsent: data?.marketingConsent || false,
+      termsAccepted: savedData?.steps?.confirmation?.termsAccepted || false,
+      marketingConsent: savedData?.steps?.confirmation?.marketingConsent || false,
     },
   });
 
-  const onSubmit = async (values: ConfirmationInputs) => {
+  const onSubmit = async (data: ConfirmationInputs) => {
     try {
-      logger.info('Processing confirmation step', values);
-      await onComplete(values);
+      logger.info('Submitting confirmation step', { data });
+      onComplete(data);
     } catch (error) {
-      logger.error('Error in confirmation step', error);
-      // Show error message to user
+      logger.error('Error submitting confirmation step', error);
+      // Handle error
     }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" noValidate>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-semibold">Almost Done!</h2>
-            <p className="text-muted-foreground mt-2">
-              Please review and accept the terms to complete your registration
-            </p>
+          <h2 className="text-2xl font-semibold">Almost Done!</h2>
+          <p className="text-gray-600">Please review and confirm your choices</p>
+
+          {/* Display summary of previous steps */}
+          <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+            <div>
+              <h3 className="font-medium">User Information</h3>
+              <p className="text-sm text-gray-600">
+                {savedData?.steps?.userInfo?.fullName} ({savedData?.steps?.userInfo?.email})
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium">Preferences</h3>
+              <p className="text-sm text-gray-600">
+                Role: {savedData?.steps?.preferences?.role}
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium">Company Details</h3>
+              <p className="text-sm text-gray-600">
+                {savedData?.steps?.companyDetails?.companyName}
+              </p>
+            </div>
           </div>
 
           <FormField
@@ -71,15 +94,7 @@ export default function ConfirmationStep({
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel>
-                    I accept the{' '}
-                    <a
-                      href="/terms"
-                      className="text-primary hover:underline"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      terms and conditions
-                    </a>
+                    I accept the terms and conditions
                   </FormLabel>
                   <FormMessage />
                 </div>
@@ -117,10 +132,12 @@ export default function ConfirmationStep({
             Back
           </Button>
           <Button type="submit">
-            Complete Registration
+            Complete Setup
           </Button>
         </div>
       </form>
     </Form>
   );
-}
+};
+
+export default ConfirmationStep;

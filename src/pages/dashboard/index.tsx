@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { logger } from '@/utils/logger';
 
-export default function DashboardPage() {
+const Dashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Double-check onboarding completion
+    // Check onboarding completion
     const onboardingData = localStorage.getItem('onboarding_data');
     if (!onboardingData) {
       logger.info('No onboarding data found, redirecting to onboarding');
@@ -19,7 +19,7 @@ export default function DashboardPage() {
     try {
       const { completedSteps } = JSON.parse(onboardingData);
       if (!completedSteps.includes(3)) {
-        logger.info('Onboarding not completed, redirecting');
+        logger.info('Onboarding not completed, redirecting to onboarding');
         navigate('/onboarding');
       }
     } catch (error) {
@@ -38,30 +38,40 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid gap-6">
-        <div className="rounded-lg border bg-card p-6">
-          <h2 className="text-lg font-semibold mb-4">Welcome, {user?.displayName || 'User'}!</h2>
-          <p className="text-muted-foreground">
-            Your dashboard is ready. Start managing your business with AISupaCRM.
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Welcome back, {user?.email}</h1>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="rounded-lg border bg-card p-6">
-            <h3 className="font-semibold mb-2">Recent Leads</h3>
-            <p className="text-muted-foreground">No leads yet</p>
-          </div>
-          <div className="rounded-lg border bg-card p-6">
-            <h3 className="font-semibold mb-2">Active Opportunities</h3>
-            <p className="text-muted-foreground">No opportunities yet</p>
-          </div>
-          <div className="rounded-lg border bg-card p-6">
-            <h3 className="font-semibold mb-2">Tasks</h3>
-            <p className="text-muted-foreground">No tasks yet</p>
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Quick Stats */}
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-2">Total Leads</h3>
+          <p className="text-3xl font-bold">0</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-2">Active Opportunities</h3>
+          <p className="text-3xl font-bold">0</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-2">Tasks Due Today</h3>
+          <p className="text-3xl font-bold">0</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-2">Conversion Rate</h3>
+          <p className="text-3xl font-bold">0%</p>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+        <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
+        <div className="text-gray-500 text-center py-8">
+          No recent activity to display
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Dashboard;

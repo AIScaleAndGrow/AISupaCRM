@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { StepProps, CompanyDetailsInputs } from '../types';
-import GoogleAddressAutocomplete from '@/components/GoogleAddressAutocomplete';
+import GoogleAddressAutocomplete from "@/components/ui/GoogleAddressAutocomplete";
 import { logger } from '@/utils/logger';
 
 const industries = [
