@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AISupaCRM</title>
+    <script>
+      // Define the callback function before loading the script
+      function initGoogleAutocomplete() {
+        // Signal that Google Maps is ready
+        window.dispatchEvent(new Event('google-maps-loaded'));
+      }
+
+      // Load the Google Maps script after the page loads
+      window.addEventListener('load', function() {
+        const script = document.createElement('script');
+        script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyA3mjOP3iUpb9cZ6U5Yi7ttX-3XZ_xLM2k&libraries=places&callback=initGoogleAutocomplete";
+        script.async = true;
+        script.defer = true;
+        script.onerror = () => {
+          console.error('Failed to load Google Maps script. Please check your API key and enabled services.');
+        };
+        document.head.appendChild(script);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
