@@ -1,0 +1,42 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Common functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function belongsToCompany(companyId) {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.companyId == companyId;
+    }
+    
+    // User profiles
+    match /users/{userId} {
+      allow read: if isSignedIn() && (isOwner(userId) || belongsToCompany(resource.data.companyId));
+      allow write: if isSignedIn() && isOwner(userId);
+    }
+    
+    // Company data
+    match /companies/{companyId} {
+      allow read: if isSignedIn() && belongsToCompany(companyId);
+      allow write: if isSignedIn() && belongsToCompany(companyId);
+      
+      // Nested collections
+      match /{document=**} {
+        allow read: if isSignedIn() && belongsToCompany(companyId);
+        allow write: if isSignedIn() && belongsToCompany(companyId);
+      }
+    }
+    
+    // Public data
+    match /public/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

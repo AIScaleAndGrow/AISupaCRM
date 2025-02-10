@@ -30,7 +30,7 @@ const settingsNavItems = [
   },
 ];
 
-const SettingsLayout: React.FC = () => {
+export function SettingsLayout() {
   const location = useLocation();
 
   return (
@@ -65,5 +65,3 @@ const SettingsLayout: React.FC = () => {
     </div>
   );
 };
-
-export default SettingsLayout;

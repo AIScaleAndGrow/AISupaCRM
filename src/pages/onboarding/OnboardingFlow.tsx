@@ -6,7 +6,7 @@ import CompanyDetailsStep from './steps/CompanyDetailsStep';
 import ConfirmationStep from './steps/ConfirmationStep';
 import { logger } from '@/utils/logger';
 
-const OnboardingFlow = () => {
+export function OnboardingFlow() {
   const [currentStep, setCurrentStep] = useState(0);
   const navigate = useNavigate();
 
@@ -162,5 +162,3 @@ const OnboardingFlow = () => {
     </div>
   );
 };
-
-export default OnboardingFlow;

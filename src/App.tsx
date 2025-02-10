@@ -1,63 +1,39 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { Toaster } from 'sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
-import LoginPage from '@/pages/auth/login';
-import OnboardingLayout from '@/components/layouts/OnboardingLayout';
-import DashboardLayout from '@/components/layouts/DashboardLayout';
-import OnboardingFlow from '@/pages/onboarding/OnboardingFlow';
-import Dashboard from '@/pages/dashboard';
-import LeadsPage from '@/pages/leads';
-import OpportunitiesPage from '@/pages/opportunities';
-import TasksPage from '@/pages/tasks';
-import ReportsPage from '@/pages/reports';
-import ProtectedRoute from '@/components/ui/ProtectedRoute';
-import SettingsLayout from '@/pages/settings/SettingsLayout';
+import { OnboardingFlow } from '@/pages/onboarding/OnboardingFlow';
+import { Dashboard } from '@/pages/dashboard/Dashboard';
+import { SettingsLayout } from '@/pages/settings/SettingsLayout';
 import AccountSettingsPage from '@/pages/settings/your-account';
 import CompanySettingsPage from '@/pages/settings/company-details';
-import { Toaster } from 'sonner';
+import { PermissionsSettingsPage } from '@/pages/settings/permissions/PermissionsSettingsPage';
+import { IntegrationsSettingsPage } from '@/pages/settings/integrations/IntegrationsSettingsPage';
+import { NotificationsSettingsPage } from '@/pages/settings/notifications/NotificationsSettingsPage';
+import LoginPage from '@/pages/auth/login';
+import DashboardLayout from '@/components/layouts/DashboardLayout';
 
-function App() {
+export function App() {
   return (
     <Router>
       <AuthProvider>
         <Toaster position="top-right" />
         <Routes>
-          {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
-
-          {/* Protected Onboarding Routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<OnboardingLayout />}>
-              <Route path="/onboarding/*" element={<OnboardingFlow />} />
-            </Route>
-
-            {/* Protected Dashboard Routes */}
-            <Route element={<DashboardLayout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/leads" element={<LeadsPage />} />
-              <Route path="/opportunities" element={<OpportunitiesPage />} />
-              <Route path="/tasks" element={<TasksPage />} />
-              <Route path="/reports" element={<ReportsPage />} />
-
-              {/* Settings Routes */}
-              <Route path="/settings" element={<SettingsLayout />}>
-                <Route index element={<Navigate to="/settings/your-account" replace />} />
-                <Route path="your-account" element={<AccountSettingsPage />} />
-                <Route path="company-details" element={<CompanySettingsPage />} />
-                <Route path="permissions" element={<div>Permissions Settings (Coming Soon)</div>} />
-                <Route path="integrations" element={<div>Integrations Settings (Coming Soon)</div>} />
-                <Route path="notifications" element={<div>Notifications Settings (Coming Soon)</div>} />
-              </Route>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/onboarding/*" element={<OnboardingFlow />} />
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/settings" element={<SettingsLayout />}>
+              <Route path="your-account" element={<AccountSettingsPage />} />
+              <Route path="company-details" element={<CompanySettingsPage />} />
+              <Route path="permissions" element={<PermissionsSettingsPage />} />
+              <Route path="integrations" element={<IntegrationsSettingsPage />} />
+              <Route path="notifications" element={<NotificationsSettingsPage />} />
             </Route>
           </Route>
-
-          {/* Redirect root to dashboard or login */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </AuthProvider>
     </Router>
   );
 }
-
-export default App;
