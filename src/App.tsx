@@ -12,11 +12,16 @@ import OpportunitiesPage from '@/pages/opportunities';
 import TasksPage from '@/pages/tasks';
 import ReportsPage from '@/pages/reports';
 import ProtectedRoute from '@/components/ui/ProtectedRoute';
+import SettingsLayout from '@/pages/settings/SettingsLayout';
+import AccountSettingsPage from '@/pages/settings/your-account';
+import CompanySettingsPage from '@/pages/settings/company-details';
+import { Toaster } from 'sonner';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
+        <Toaster position="top-right" />
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
@@ -34,6 +39,16 @@ function App() {
               <Route path="/opportunities" element={<OpportunitiesPage />} />
               <Route path="/tasks" element={<TasksPage />} />
               <Route path="/reports" element={<ReportsPage />} />
+
+              {/* Settings Routes */}
+              <Route path="/settings" element={<SettingsLayout />}>
+                <Route index element={<Navigate to="/settings/your-account" replace />} />
+                <Route path="your-account" element={<AccountSettingsPage />} />
+                <Route path="company-details" element={<CompanySettingsPage />} />
+                <Route path="permissions" element={<div>Permissions Settings (Coming Soon)</div>} />
+                <Route path="integrations" element={<div>Integrations Settings (Coming Soon)</div>} />
+                <Route path="notifications" element={<div>Notifications Settings (Coming Soon)</div>} />
+              </Route>
             </Route>
           </Route>
 

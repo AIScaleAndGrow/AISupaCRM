@@ -10,14 +10,34 @@ const OnboardingFlow = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const navigate = useNavigate();
 
+  // Check if onboarding is already complete
   useEffect(() => {
+    const isComplete = localStorage.getItem('onboarding_complete') === 'true';
+    if (isComplete) {
+      logger.info('Onboarding already complete, redirecting to dashboard');
+      navigate('/dashboard', { replace: true });
+      return;
+    }
+
     // Load saved progress
     const savedData = localStorage.getItem('onboarding_data');
     if (savedData) {
       const { currentStep: savedStep } = JSON.parse(savedData);
       setCurrentStep(savedStep);
     }
-  }, []);
+  }, [navigate]);
+
+  const completeOnboarding = () => {
+    // Mark onboarding as complete first
+    localStorage.setItem('onboarding_complete', 'true');
+    logger.info('Onboarding marked as complete');
+
+    // Small delay to ensure localStorage is updated
+    setTimeout(() => {
+      logger.info('Redirecting to dashboard');
+      navigate('/dashboard', { replace: true });
+    }, 100);
+  };
 
   const handleStepComplete = (stepData: any) => {
     const savedData = localStorage.getItem('onboarding_data') || '{}';
@@ -38,8 +58,7 @@ const OnboardingFlow = () => {
     logger.info(`Step ${currentStep} completed`, { stepData });
 
     if (currentStep === 3) {
-      // All steps completed
-      navigate('/dashboard');
+      completeOnboarding();
     } else {
       setCurrentStep(currentStep + 1);
     }

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation, Navigate, Outlet } from 'react-router-dom';
+import React from 'react';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { logger } from '@/utils/logger';
 
@@ -9,25 +9,33 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    logger.info('Protected route check', { path: location.pathname });
-  }, [location.pathname]);
-
+  // Show loading state
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      </div>
+    );
   }
 
+  // Not authenticated - redirect to login
   if (!user) {
+    logger.info('User not authenticated, redirecting to login');
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // Check if onboarding is complete
+  // Special case: Don't check onboarding status for these paths
+  const bypassPaths = ['/onboarding', '/login'];
+  if (bypassPaths.includes(location.pathname)) {
+    return children || <Outlet />;
+  }
+
+  // Check onboarding status
   const isOnboardingComplete = localStorage.getItem('onboarding_complete') === 'true';
-  if (!isOnboardingComplete && location.pathname !== '/onboarding') {
-    logger.info('User has not completed onboarding, redirecting...');
+  if (!isOnboardingComplete) {
+    logger.info('Onboarding incomplete, redirecting to onboarding');
     return <Navigate to="/onboarding" replace />;
   }
 

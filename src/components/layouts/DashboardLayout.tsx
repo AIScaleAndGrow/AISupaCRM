@@ -12,6 +12,7 @@ import {
   CheckSquare,
   BarChart2,
   LogOut,
+  Settings,
 } from 'lucide-react';
 
 const DashboardLayout: React.FC = () => {
@@ -38,6 +39,7 @@ const DashboardLayout: React.FC = () => {
     { path: '/opportunities', label: 'Opportunities', icon: Target },
     { path: '/tasks', label: 'Tasks', icon: CheckSquare },
     { path: '/reports', label: 'Reports', icon: BarChart2 },
+    { path: '/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -72,7 +74,7 @@ const DashboardLayout: React.FC = () => {
               key={path}
               to={path}
               className={`flex items-center px-4 py-2 mb-1 text-gray-700 hover:bg-gray-100 ${
-                location.pathname === path ? 'bg-gray-100' : ''
+                location.pathname.startsWith(path) ? 'bg-gray-100' : ''
               }`}
             >
               <Icon className="h-5 w-5" />
